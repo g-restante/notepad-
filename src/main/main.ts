@@ -65,7 +65,6 @@ class NotePadProApp {
     } else {
       // In production, load the built HTML file
       const indexPath = path.join(app.getAppPath(), 'dist', 'index.html');
-      console.log('Loading app from:', indexPath);
       this.mainWindow.loadFile(indexPath);
     }
 

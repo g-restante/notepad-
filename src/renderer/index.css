@@ -53,3 +53,89 @@ body {
 .dark-theme ::-webkit-scrollbar-thumb:hover {
   background: #777;
 }
+
+/* Responsive status bar */
+@media (max-width: 800px) {
+  .status-bar-compact {
+    font-size: 10px !important;
+    padding: 0 4px !important;
+  }
+  
+  .status-bar-compact .status-section {
+    gap: 4px !important;
+  }
+  
+  .status-bar-compact select {
+    font-size: 10px !important;
+    padding: 1px 2px !important;
+    max-width: 60px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .status-bar-compact {
+    font-size: 9px !important;
+  }
+  
+  .status-bar-compact .hide-on-small {
+    display: none !important;
+  }
+}
+
+/* Specifically target tab bar and editor area */
+.app-container {
+  border: none !important;
+  outline: none !important;
+}
+
+.tab-bar {
+  border: none !important;
+  border-bottom: none !important;
+  border-top: none !important;
+  outline: none !important;
+}
+
+.editor-area {
+  border: none !important;
+  border-top: none !important;
+  outline: none !important;
+}
+
+/* Ant Design override - remove any borders */
+.ant-layout,
+.ant-layout-content {
+  border: none !important;
+}
+
+/* Monaco Editor border removal */
+.monaco-editor,
+.monaco-editor .overflow-guard,
+.monaco-editor .monaco-scrollable-element {
+  border: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+}
+
+/* Force remove all borders globally */
+*, *::before, *::after {
+  border-top: none !important;
+  border-bottom: none !important;
+}
+
+/* Specific overrides for common elements */
+div, section, main, article {
+  border-top: none !important;
+  border-bottom: none !important;
+}
+
+/* Tab bar specific overrides */
+.tab-bar, .tab-bar * {
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+/* Editor area specific overrides */
+.editor-area, .editor-area * {
+  border-top: none !important;
+  box-shadow: none !important;
+}

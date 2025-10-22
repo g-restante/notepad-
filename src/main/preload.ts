@@ -11,7 +11,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   // Menu events
   onMenuAction: (callback: (action: string) => void) => {
-    const channels = ['menu-new-file', 'menu-open-file', 'menu-save', 'menu-save-as', 'menu-find', 'menu-replace'];
+    const channels = [
+      'menu-new-file', 'menu-open-file', 'menu-save', 'menu-save-as', 'menu-find', 'menu-replace',
+      'menu-toggle-theme', 'menu-theme-auto', 'menu-theme-light', 'menu-theme-dark', 'menu-theme-highcontrast',
+      'menu-toggle-minimap', 'menu-toggle-wordwrap', 'menu-open-settings',
+      'menu-language-plaintext', 'menu-language-javascript', 'menu-language-typescript',
+      'menu-language-html', 'menu-language-css', 'menu-language-json', 'menu-language-python', 'menu-language-java'
+    ];
     channels.forEach(channel => {
       ipcRenderer.on(channel, () => callback(channel));
     });

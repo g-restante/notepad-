@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
+import { notification } from 'antd';
 
 // Monaco Editor configuration for Electron
 if (typeof global === 'undefined') {
@@ -12,9 +13,55 @@ if (typeof process === 'undefined') {
 // Configure Monaco Environment for Electron
 (window as any).MonacoEnvironment = {
   getWorkerUrl: function (moduleId: string, label: string) {
-    // Disable workers in Electron environment
+    // Always return empty data URL to prevent any worker loading
     return 'data:text/javascript;charset=utf-8,;';
+  },
+  getWorker: function (workerId: string, label: string) {
+    // Always return null to prevent worker creation
+    return null;
   }
+};
+
+// Override global error handler to suppress Monaco worker errors
+const originalErrorHandler = window.onerror;
+window.onerror = function(message, source, lineno, colno, error) {
+  // Suppress Monaco worker-related errors
+  if (typeof message === 'string' && 
+      (message.includes('Unexpected usage') || 
+       message.includes('loadForeignModule') ||
+       message.includes('getLanguageServiceWorker'))) {
+    return true; // Prevent error from being logged
+  }
+  
+  // Call original error handler for other errors
+  if (originalErrorHandler) {
+    return originalErrorHandler.call(window, message, source, lineno, colno, error);
+  }
+  return false;
+};
+
+// Also override unhandled promise rejections
+window.addEventListener('unhandledrejection', function(event) {
+  if (event.reason && 
+      (event.reason.message?.includes('Unexpected usage') ||
+       event.reason.message?.includes('loadForeignModule') ||
+       event.reason.message?.includes('getLanguageServiceWorker'))) {
+    event.preventDefault(); // Prevent error from being logged
+  }
+});
+
+// Filter only specific debug messages without breaking functionality
+const originalConsoleLog = console.log;
+console.log = (...args: any[]) => {
+  const message = args.join(' ');
+  // Filter out only specific Monaco debug messages that are annoying
+  if (
+    typeof message === 'string' && 
+    message.includes('Changing language to:')
+  ) {
+    return;
+  }
+  originalConsoleLog.apply(console, args);
 };
 
 // Electron API interface
@@ -148,23 +195,55 @@ const MonacoEditor: React.FC<{
   minimapEnabled: boolean;
   wordWrapEnabled: boolean;
   onEditorMount?: (editor: any) => void;
-}> = ({ value, onChange, language, theme, minimapEnabled, wordWrapEnabled, onEditorMount }) => {
+  onSelectionChange?: (selectionInfo: {
+    selectedText: string;
+    selectedLength: number;
+    cursorPosition: { line: number; column: number };
+  }) => void;
+}> = ({ value, onChange, language, theme, minimapEnabled, wordWrapEnabled, onEditorMount, onSelectionChange }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const [editor, setEditor] = useState<any>(null);
+  const [monaco, setMonaco] = useState<any>(null);
 
   useEffect(() => {
     if (editorRef.current && !editor) {
       // Dynamically import Monaco Editor
-      import('monaco-editor').then((monaco) => {
-        // Configure Monaco to work without workers
-        monaco.languages.typescript.typescriptDefaults.setWorkerOptions({
+      import('monaco-editor').then((monacoModule) => {
+        setMonaco(monacoModule);
+        
+        // Completely disable TypeScript/JavaScript language services to prevent worker errors
+        monacoModule.languages.typescript.typescriptDefaults.setWorkerOptions({
           customWorkerPath: undefined
         });
-        monaco.languages.typescript.javascriptDefaults.setWorkerOptions({
+        monacoModule.languages.typescript.javascriptDefaults.setWorkerOptions({
           customWorkerPath: undefined
+        });
+        
+        // Disable all TypeScript/JavaScript diagnostics and features that require workers
+        monacoModule.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+          noSyntaxValidation: true,
+          noSemanticValidation: true,
+          noSuggestionDiagnostics: true
+        });
+        
+        monacoModule.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+          noSyntaxValidation: true,
+          noSemanticValidation: true,
+          noSuggestionDiagnostics: true
+        });
+        
+        // Disable compiler options that might trigger worker usage
+        monacoModule.languages.typescript.typescriptDefaults.setCompilerOptions({
+          noLib: true,
+          allowNonTsExtensions: true
+        });
+        
+        monacoModule.languages.typescript.javascriptDefaults.setCompilerOptions({
+          noLib: true,
+          allowNonTsExtensions: true
         });
 
-        const newEditor = monaco.editor.create(editorRef.current!, {
+        const newEditor = monacoModule.editor.create(editorRef.current!, {
           value: value,
           language: language,
           theme: theme,
@@ -186,25 +265,68 @@ const MonacoEditor: React.FC<{
           folding: true,
           foldingStrategy: 'indentation',
           showFoldingControls: 'always',
-          // Advanced features
-          quickSuggestions: {
-            other: true,
-            comments: true,
-            strings: true
-          },
-          acceptSuggestionOnCommitCharacter: true,
-          acceptSuggestionOnEnter: 'on',
-          tabCompletion: 'on',
+          // Disable features that might use workers
+          quickSuggestions: false,
+          acceptSuggestionOnCommitCharacter: false,
+          acceptSuggestionOnEnter: 'off',
+          tabCompletion: 'off',
           // Find and replace
           find: {
             seedSearchStringFromSelection: 'always',
             autoFindInSelection: 'never'
           },
+          // Disable hover and language features that require workers
+          hover: {
+            enabled: false
+          },
+          parameterHints: {
+            enabled: false
+          },
+          suggestOnTriggerCharacters: false,
+          wordBasedSuggestions: 'off',
+          // Keep basic editor functionality
+          contextmenu: true,
+          mouseWheelZoom: true
         });
 
         newEditor.onDidChangeModelContent(() => {
           const newValue = newEditor.getValue();
           onChange(newValue);
+        });
+
+        // Listen for cursor position and selection changes
+        newEditor.onDidChangeCursorPosition((e) => {
+          if (onSelectionChange) {
+            const position = newEditor.getPosition();
+            const selection = newEditor.getSelection();
+            const selectedText = selection ? newEditor.getModel()?.getValueInRange(selection) || '' : '';
+            
+            onSelectionChange({
+              selectedText: selectedText,
+              selectedLength: selectedText.length,
+              cursorPosition: {
+                line: position?.lineNumber || 1,
+                column: position?.column || 1
+              }
+            });
+          }
+        });
+
+        newEditor.onDidChangeCursorSelection((e) => {
+          if (onSelectionChange) {
+            const position = newEditor.getPosition();
+            const selection = newEditor.getSelection();
+            const selectedText = selection ? newEditor.getModel()?.getValueInRange(selection) || '' : '';
+            
+            onSelectionChange({
+              selectedText: selectedText,
+              selectedLength: selectedText.length,
+              cursorPosition: {
+                line: position?.lineNumber || 1,
+                column: position?.column || 1
+              }
+            });
+          }
         });
 
         setEditor(newEditor);
@@ -227,22 +349,45 @@ const MonacoEditor: React.FC<{
     }
   }, [value, editor]);
 
+  // Handle language changes - completely avoid Monaco's language service activation
   useEffect(() => {
-    if (editor) {
-      import('monaco-editor').then((monaco) => {
-        const currentValue = editor.getValue();
-        // Dispose the current model and create a new one with the correct language
-        const model = editor.getModel();
-        if (model) {
-          model.dispose();
+    if (editor && monaco) {
+      const currentModel = editor.getModel();
+      if (currentModel) {
+        const currentLanguage = currentModel.getLanguageId();
+        
+        if (currentLanguage !== language) {
+          // Instead of changing language on existing model, create a new one
+          // This avoids triggering Monaco's language service worker system
+          const content = currentModel.getValue();
+          const newModel = monaco.editor.createModel(content, language);
+          
+          // Preserve cursor position
+          const position = editor.getPosition();
+          
+          // Set the new model
+          editor.setModel(newModel);
+          
+          // Restore cursor position
+          if (position) {
+            editor.setPosition(position);
+          }
+          
+          // Dispose the old model to prevent memory leaks
+          currentModel.dispose();
         }
-        const newModel = monaco.editor.createModel(currentValue, language);
-        editor.setModel(newModel);
-      });
+      }
     }
-  }, [language, editor]);
+  }, [language, editor, monaco]);
 
-  return <div ref={editorRef} style={{ width: '100%', height: '100%' }} />;
+  return <div ref={editorRef} style={{ 
+    width: '100%', 
+    height: '100%',
+    border: 'none',
+    borderTop: 'none',
+    borderBottom: 'none',
+    outline: 'none'
+  }} />;
 };
 
 // App Component with multiple file management
@@ -309,6 +454,15 @@ const App: React.FC = () => {
     }
   ]);
   const [activeTabId, setActiveTabId] = useState('1');
+  const [selectionInfo, setSelectionInfo] = useState<{
+    selectedText: string;
+    selectedLength: number;
+    cursorPosition: { line: number; column: number };
+  }>({
+    selectedText: '',
+    selectedLength: 0,
+    cursorPosition: { line: 1, column: 1 }
+  });
   const editorInstanceRef = useRef<any>(null);
 
   // Update theme when settings change
@@ -533,7 +687,11 @@ const App: React.FC = () => {
 
   const handleOpen = async () => {
     if (!window.electronAPI) {
-      alert('File operations not available in this environment');
+      notification.warning({
+        message: 'File Operations Unavailable',
+        description: 'File operations are not available in this environment.',
+        placement: 'topRight',
+      });
       return;
     }
 
@@ -560,10 +718,18 @@ const App: React.FC = () => {
         setTabs([...tabs, newTab]);
         setActiveTabId(newTab.id);
       } else {
-        alert('Error reading file: ' + fileResult.error);
+        notification.error({
+          message: 'File Read Error',
+          description: `Error reading file: ${fileResult.error}`,
+          placement: 'topRight',
+        });
       }
     } catch (error) {
-      alert('Error opening file: ' + error);
+      notification.error({
+        message: 'File Open Error',
+        description: `Error opening file: ${error}`,
+        placement: 'topRight',
+      });
     }
   };
 
@@ -577,14 +743,22 @@ const App: React.FC = () => {
         if (result.success) {
           updateTab(activeTab.id, { isDirty: false });
         } else {
-          alert('Error saving file: ' + result.error);
+          notification.error({
+            message: 'File Save Error',
+            description: `Error saving file: ${result.error}`,
+            placement: 'topRight',
+          });
         }
       } else {
         // Save as new file
         handleSaveAs();
       }
     } catch (error) {
-      alert('Error saving file: ' + error);
+      notification.error({
+        message: 'File Save Error',
+        description: `Error saving file: ${error}`,
+        placement: 'topRight',
+      });
     }
   };
 
@@ -607,10 +781,18 @@ const App: React.FC = () => {
           language: detectedLanguage
         });
       } else {
-        alert('Error saving file: ' + saveResult.error);
+        notification.error({
+          message: 'File Save Error',
+          description: `Error saving file: ${saveResult.error}`,
+          placement: 'topRight',
+        });
       }
     } catch (error) {
-      alert('Error saving file: ' + error);
+      notification.error({
+        message: 'File Save Error',
+        description: `Error saving file: ${error}`,
+        placement: 'topRight',
+      });
     }
   };
 
@@ -871,27 +1053,30 @@ const App: React.FC = () => {
   };
 
   return (
-    <div style={{ 
+    <div className="app-container" style={{ 
       height: '100vh', 
       display: 'flex', 
       flexDirection: 'column',
       fontFamily: userSettings.fontFamily,
       background: currentTheme.backgroundColor,
-      paddingTop: isMac ? '28px' : '0' // Space for macOS title bar
+      border: 'none',
+      outline: 'none'
     }}>
 
       {/* Tab bar */}
-      <div style={{
+      <div className="tab-bar" style={{
         height: '32px',
         background: isMac && currentTheme.monacoTheme === 'vs-dark' 
           ? currentTheme.tabBackgroundColor
           : isMac 
           ? '#e8e8e8'  // Match macOS light title bar better
           : currentTheme.tabBackgroundColor,
-        borderBottom: `1px solid ${currentTheme.borderColor}`,
         display: 'flex',
         alignItems: 'center',
-        overflow: 'auto'
+        overflow: 'auto',
+        border: 'none',
+        borderBottom: 'none',
+        borderTop: 'none'
       }}>
         {tabs.map(tab => (
           <div
@@ -937,10 +1122,48 @@ const App: React.FC = () => {
             )}
           </div>
         ))}
+        
+        {/* New File Button */}
+        <button
+          onClick={handleNew}
+          title="New File (Ctrl+N)"
+          style={{
+            height: '100%',
+            padding: '0 12px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'transparent',
+            border: 'none',
+            borderRight: `1px solid ${currentTheme.borderColor}`,
+            cursor: 'pointer',
+            color: currentTheme.foregroundColor,
+            fontSize: '16px',
+            minWidth: '40px',
+            transition: 'background-color 0.2s ease',
+            opacity: 0.7
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.opacity = '1';
+            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.opacity = '0.7';
+            e.currentTarget.style.background = 'transparent';
+          }}
+        >
+          +
+        </button>
       </div>
 
       {/* Area di editing con Monaco */}
-      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+      <div className="editor-area" style={{ 
+        flex: 1, 
+        display: 'flex', 
+        overflow: 'hidden',
+        border: 'none',
+        borderTop: 'none'
+      }}>
         {activeTab && (
           <MonacoEditor
             value={activeTab.content}
@@ -949,6 +1172,7 @@ const App: React.FC = () => {
             theme={currentTheme.monacoTheme}
             minimapEnabled={userSettings.minimapEnabled}
             wordWrapEnabled={userSettings.wordWrapEnabled}
+            onSelectionChange={setSelectionInfo}
             onEditorMount={(editor) => {
               editorInstanceRef.current = editor;
             }}
@@ -957,25 +1181,75 @@ const App: React.FC = () => {
       </div>
 
       {/* Status bar */}
-      <div style={{
+      <div className="status-bar-compact" style={{
         height: '24px',
         background: currentTheme.accentColor,
         color: 'white',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 16px',
-        fontSize: '12px',
-        fontFamily: 'monospace'
+        padding: '0 8px',
+        fontSize: '11px',
+        fontFamily: 'monospace',
+        overflow: 'hidden',
+        whiteSpace: 'nowrap'
       }}>
-        <span>
-          {activeTab?.language.toUpperCase() || 'PLAINTEXT'}
-          {activeTab?.filePath && ` • ${activeTab.filePath.split('/').pop()}`}
-          {activeTab?.isDirty && ' • Modified'}
-        </span>
-        <span>
-          UTF-8 | Ln {activeTab?.content.split('\n').length || 0} | Ch {activeTab?.content.length || 0}
-        </span>
+        <div className="status-section" style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '8px',
+          minWidth: 0,
+          flex: '0 0 auto'
+        }}>
+          {/* Language selector - clickable */}
+          <select
+            value={activeTab?.language || 'plaintext'}
+            onChange={(e) => handleLanguageChange(e.target.value)}
+            style={{
+              background: 'rgba(255, 255, 255, 0.1)',
+              color: 'white',
+              border: 'none',
+              padding: '1px 4px',
+              borderRadius: '3px',
+              fontSize: '11px',
+              cursor: 'pointer',
+              maxWidth: '80px'
+            }}
+          >
+            {languages.map(lang => (
+              <option key={lang.value} value={lang.value} style={{ color: 'black' }}>
+                {lang.label}
+              </option>
+            ))}
+          </select>
+          
+          {activeTab?.filePath && (
+            <span className="hide-on-small" style={{ 
+              overflow: 'hidden', 
+              textOverflow: 'ellipsis',
+              maxWidth: '150px'
+            }}>
+              • {activeTab.filePath.split('/').pop()}
+            </span>
+          )}
+          {activeTab?.isDirty && (
+            <span>• Modified</span>
+          )}
+        </div>
+        
+        <div className="status-section" style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '8px',
+          minWidth: 0,
+          flex: '0 0 auto'
+        }}>
+          {selectionInfo.selectedLength > 0 && (
+            <span>Sel: {selectionInfo.selectedLength}</span>
+          )}
+          <span>Ln {selectionInfo.cursorPosition.line}, Col {selectionInfo.cursorPosition.column}</span>
+          <span className="hide-on-small">UTF-8</span>
+        </div>
       </div>
 
       {/* Settings Modal */}

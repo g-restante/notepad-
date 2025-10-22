@@ -7,7 +7,7 @@ module.exports = (env, argv) => {
 
   return {
     entry: './src/renderer/index.tsx',
-    target: 'electron-renderer',
+    target: 'electron-renderer', // Always use electron-renderer target
     context: path.resolve(__dirname),
     module: {
       rules: [
@@ -36,19 +36,6 @@ module.exports = (env, argv) => {
       alias: {
         '@': path.resolve(__dirname, 'src/renderer'),
       },
-      fallback: {
-        "path": false,
-        "os": false,
-        "crypto": false,
-        "stream": false,
-        "buffer": false,
-        "process": false,
-        "util": false,
-        "fs": false,
-        "child_process": false,
-        "net": false,
-        "tls": false
-      },
     },
     output: {
       filename: 'bundle.js',
@@ -74,9 +61,12 @@ module.exports = (env, argv) => {
       liveReload: false,
       historyApiFallback: true,
       host: 'localhost',
-      setupMiddlewares: (middlewares, devServer) => {
-        return middlewares;
+      allowedHosts: 'all',
+      headers: {
+        'Access-Control-Allow-Origin': '*',
       },
+      webSocketServer: false,
+      client: false,
     },
     devtool: isProduction ? 'source-map' : 'eval-source-map',
   };
