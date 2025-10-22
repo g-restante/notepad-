@@ -1,43 +1,43 @@
 # Notepad Pro
 
-Un moderno editor di testo cross-platform costruito con Electron, React, TypeScript e Monaco Editor.
+A modern cross-platform text editor built with Electron, React, TypeScript and Monaco Editor.
 
-## Caratteristiche
+## Features
 
-### 🎨 Interfaccia Moderna
-- Design pulito e accattivante
-- Tema chiaro e scuro
-- Layout responsivo
-- Interfaccia intuitiva simile a VS Code
+### 🎨 Modern Interface
+- Clean and appealing design
+- Light and dark themes
+- Responsive layout
+- Intuitive VS Code-like interface
 
-### ⚡ Performance e Velocità
-- Basato su Monaco Editor (lo stesso di VS Code)
-- Rendering veloce anche per file grandi
-- Avvio rapido dell'applicazione
-- Gestione efficiente della memoria
+### ⚡ Performance and Speed
+- Based on Monaco Editor (same as VS Code)
+- Fast rendering even for large files
+- Quick application startup
+- Efficient memory management
 
-### 🔧 Funzionalità Avanzate
-- **Evidenziazione sintassi** per linguaggi multipli (JavaScript, TypeScript, HTML, CSS, Python, Java, C++, etc.)
-- **Autocompletamento** intelligente
-- **Ricerca e sostituzione** avanzata con supporto regex
-- **Gestione tabs** multipli
-- **Minimap** del codice
-- **Folding del codice** (collassa/espandi blocchi)
-- **Numerazione righe** opzionale
-- **Word wrap** configurabile
-- **Zoom** dinamico del testo
+### 🔧 Advanced Features
+- **Syntax highlighting** for multiple languages (JavaScript, TypeScript, HTML, CSS, Python, Java, C++, etc.)
+- **Intelligent autocompletion**
+- **Advanced search and replace** with regex support
+- **Multiple tabs** management
+- **Code minimap**
+- **Code folding** (collapse/expand blocks)
+- **Optional line numbering**
+- **Configurable word wrap**
+- **Dynamic text zoom**
 
-### 💾 Gestione File
-- Apertura file multipli
-- Salvataggio automatico
-- Gestione sessioni
-- Supporto per tutti i formati di testo
+### 💾 File Management
+- Multiple file opening
+- Auto-save
+- Session management
+- Support for all text formats
 
-### ⚙️ Personalizzazione
-- Dimensioni font configurabili
-- Impostazioni tab (spazi vs tabs)
-- Temi personalizzabili
-- Scorciatoie da tastiera
+### ⚙️ Customization
+- Configurable font sizes
+- Tab settings (spaces vs tabs)
+- Customizable themes
+- Keyboard shortcuts
 
 ## Cross-Platform
 
@@ -45,67 +45,67 @@ Un moderno editor di testo cross-platform costruito con Electron, React, TypeScr
 ✅ **macOS** (10.12+)  
 ✅ **Linux** (Ubuntu, Debian, Fedora, etc.)
 
-## Installazione
+## Installation
 
-### Prerequisiti
-- Node.js 18 o superiore
-- npm o yarn
+### Prerequisites
+- Node.js 18 or higher
+- npm or yarn
 
-### Sviluppo
+### Development
 ```bash
-# Clone del repository
+# Clone the repository
 git clone https://github.com/your-username/notepad-pro.git
 cd notepad-pro
 
-# Installa dipendenze
+# Install dependencies
 npm install
 
-# Avvia in modalità sviluppo
+# Start in development mode
 npm run dev
 ```
 
-### Build per Produzione
+### Production Build
 ```bash
-# Build per tutte le piattaforme
+# Build for all platforms
 npm run build:all
 
-# Build specifiche per piattaforma
+# Platform-specific builds
 npm run build:win    # Windows
 npm run build:mac    # macOS
 npm run build:linux  # Linux
 ```
 
-## Utilizzo
+## Usage
 
-### Scorciatoie da Tastiera
+### Keyboard Shortcuts
 
 #### File
-- `Ctrl/Cmd + N` - Nuovo file
-- `Ctrl/Cmd + O` - Apri file
-- `Ctrl/Cmd + S` - Salva
-- `Ctrl/Cmd + Shift + S` - Salva con nome
+- `Ctrl/Cmd + N` - New file
+- `Ctrl/Cmd + O` - Open file
+- `Ctrl/Cmd + S` - Save
+- `Ctrl/Cmd + Shift + S` - Save as
 
 #### Editing
-- `Ctrl/Cmd + F` - Trova
-- `Ctrl/Cmd + H` - Sostituisci
-- `Ctrl/Cmd + Z` - Annulla
-- `Ctrl/Cmd + Y` - Ripristina
-- `Ctrl/Cmd + A` - Seleziona tutto
+- `Ctrl/Cmd + F` - Find
+- `Ctrl/Cmd + H` - Replace
+- `Ctrl/Cmd + Z` - Undo
+- `Ctrl/Cmd + Y` - Redo
+- `Ctrl/Cmd + A` - Select all
 
-#### Visualizzazione
-- `Ctrl/Cmd + +` - Aumenta zoom
-- `Ctrl/Cmd + -` - Diminuisci zoom
+#### View
+- `Ctrl/Cmd + +` - Zoom in
+- `Ctrl/Cmd + -` - Zoom out
 - `Ctrl/Cmd + 0` - Reset zoom
 
-### Menu Contestuale
+### Context Menu
 
-L'editor supporta un ricco menu contestuale con opzioni per:
-- Copia, taglia, incolla
-- Formattazione codice
-- Vai alla definizione
-- Trova riferimenti
+The editor supports a rich context menu with options for:
+- Copy, cut, paste
+- Code formatting
+- Go to definition
+- Find references
 
-## Stack Tecnologico
+## Technology Stack
 
 - **Frontend**: React 18 + TypeScript
 - **Editor**: Monaco Editor
@@ -114,80 +114,140 @@ L'editor supporta un ricco menu contestuale con opzioni per:
 - **Desktop**: Electron
 - **Build**: Webpack + Electron Builder
 
-## Architettura
+## Architecture
 
 ```
 src/
-├── main/           # Processo principale Electron
-│   ├── main.ts     # Entry point Electron
-│   └── preload.ts  # Script preload sicuro
-├── renderer/       # Processo renderer React
-│   ├── components/ # Componenti UI React
-│   ├── store/      # Gestione stato Zustand
-│   ├── types/      # Definizioni TypeScript
-│   └── App.tsx     # Componente principale
-└── assets/         # Risorse statiche
+├── main/           # Electron main process
+│   ├── main.ts     # Electron entry point
+│   └── preload.ts  # Secure preload script
+├── renderer/       # React renderer process
+│   ├── components/ # React UI components
+│   ├── store/      # Zustand state management
+│   ├── types/      # TypeScript definitions
+│   └── App.tsx     # Main component
+└── assets/         # Static resources
 ```
 
-## Configurazione
+## Configuration
 
-L'app supporta configurazioni personalizzabili tramite:
-- Impostazioni integrate nell'UI
-- File di configurazione locale
-- Variabili d'ambiente per sviluppo
+The app supports customizable configurations through:
+- Built-in UI settings
+- Local configuration file
+- Environment variables for development
 
-### Variabili d'Ambiente
+### Environment Variables
 
 ```bash
-NODE_ENV=development  # Modalità sviluppo
-ELECTRON_IS_DEV=1    # Debug Electron
+NODE_ENV=development  # Development mode
+ELECTRON_IS_DEV=1    # Electron debug
 ```
 
-## Sicurezza
+## Security
 
-- Context isolation attivato
-- Node integration disabilitato nel renderer
-- Preload script sicuro per comunicazione IPC
-- Sandboxing per sicurezza aggiuntiva
+- Context isolation enabled
+- Node integration disabled in renderer
+- Secure preload script for IPC communication
+- Sandboxing for additional security
 
-## Contribuire
+## Contributing
 
-1. Fork del progetto
-2. Crea feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit delle modifiche (`git commit -m 'Add some AmazingFeature'`)
-4. Push al branch (`git push origin feature/AmazingFeature`)
-5. Apri Pull Request
+1. Fork the project
+2. Create feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## Roadmap
 
 ### v1.1
 - [ ] Plugin system
-- [ ] Syntax highlighting personalizzato
-- [ ] Supporto per workspace multipli
+- [ ] Custom syntax highlighting
+- [ ] Multiple workspace support
 
 ### v1.2
 - [ ] Git integration
-- [ ] Terminal integrato
-- [ ] Estensioni marketplace
+- [ ] Integrated terminal
+- [ ] Extensions marketplace
 
 ### v1.3
 - [ ] Collaborative editing
 - [ ] Cloud sync
 - [ ] Mobile companion app
 
-## Licenza
+## 📦 Build and Distribution
 
-MIT License - vedi il file [LICENSE](LICENSE) per i dettagli.
+### Local Build
 
-## Supporto
+To build and package the application locally:
+
+```bash
+# Build for current platform
+npm run package
+
+# Build for all platforms
+npm run package:all
+
+# Platform-specific builds
+npm run package:mac     # macOS only
+npm run package:win     # Windows only  
+npm run package:linux   # Linux only
+```
+
+### Automated Releases with GitHub Actions
+
+The project includes an automated CI/CD pipeline that:
+
+1. **Builds on every push** to main branch
+2. **Creates releases** when you push a version tag
+3. **Supports all platforms**: macOS, Windows, Linux
+
+#### To create a release:
+
+1. Update version in `package.json`:
+```json
+{
+  "version": "1.1.0"
+}
+```
+
+2. Commit and push changes:
+```bash
+git add package.json
+git commit -m "chore: bump version to v1.1.0"
+git push origin main
+```
+
+3. Create and push a version tag:
+```bash
+git tag v1.1.0
+git push origin v1.1.0
+```
+
+4. GitHub Actions will automatically:
+   - Build the app for all platforms
+   - Create installation packages (DMG for macOS, NSIS for Windows, AppImage/DEB for Linux)
+   - Create a GitHub release with all artifacts
+
+### Distribution Formats
+
+- **macOS**: DMG installer + ZIP archive (Intel + Apple Silicon)
+- **Windows**: NSIS installer + Portable executable (x64 + x86)
+- **Linux**: AppImage + DEB package (x64)
+
+## License
+
+MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Support
 
 - 📧 Email: support@notepad-pro.com
 - 🐛 Issues: [GitHub Issues](https://github.com/your-username/notepad-pro/issues)
-- 💬 Discussioni: [GitHub Discussions](https://github.com/your-username/notepad-pro/discussions)
+- 💬 Discussions: [GitHub Discussions](https://github.com/your-username/notepad-pro/discussions)
 
 ## Credits
 
-Creato con ❤️ da Giuseppe Restante
+Created with ❤️ by Giuseppe Restante
 
 - Monaco Editor by Microsoft
 - Ant Design by Ant Group

@@ -245,7 +245,7 @@ const MonacoEditor: React.FC<{
   return <div ref={editorRef} style={{ width: '100%', height: '100%' }} />;
 };
 
-// Componente App con gestione file multipli
+// App Component with multiple file management
 const App: React.FC = () => {
   // Load settings from localStorage
   const loadSettings = (): UserSettings => {
@@ -372,7 +372,7 @@ const App: React.FC = () => {
 
   const activeTab = tabs.find(tab => tab.id === activeTabId);
 
-  // Gestione eventi dal menu nativo
+  // Native menu event handling
   useEffect(() => {
     if (window.electronAPI?.onMenuAction) {
       window.electronAPI.onMenuAction((action: string) => {
@@ -547,7 +547,6 @@ const App: React.FC = () => {
       if (fileResult.success && fileResult.content !== undefined) {
         const fileName = filePath.split('/').pop() || 'Unknown';
         const language = detectLanguageFromFileName(fileName);
-        console.log('File opened, detecting language from fileName:', fileName, '-> language:', language);
         
         const newTab: FileTab = {
           id: Date.now().toString(),
@@ -600,7 +599,6 @@ const App: React.FC = () => {
       if (saveResult.success) {
         const fileName = result.filePath.split('/').pop() || 'Unknown';
         const detectedLanguage = detectLanguageFromFileName(fileName);
-        console.log('File saved, detecting language from fileName:', fileName, '-> language:', detectedLanguage);
         
         updateTab(activeTab.id, { 
           title: fileName,
@@ -617,24 +615,10 @@ const App: React.FC = () => {
   };
 
   const updateTab = (tabId: string, updates: Partial<FileTab>) => {
-    console.log('updateTab called:', tabId, updates);
-    console.log('Current activeTab before update:', activeTab);
-    
     setTabs(prevTabs => {
-      const oldTab = prevTabs.find(tab => tab.id === tabId);
-      console.log('Old tab before update:', oldTab);
-      
-      const newTabs = prevTabs.map(tab => {
-        if (tab.id === tabId) {
-          const updatedTab = { ...tab, ...updates };
-          console.log('Tab updated from:', tab, 'to:', updatedTab);
-          return updatedTab;
-        }
-        return tab;
-      });
-      
-      console.log('New tabs state:', newTabs);
-      console.log('Updated tab language:', newTabs.find(tab => tab.id === tabId)?.language);
+      const newTabs = prevTabs.map(tab => 
+        tab.id === tabId ? { ...tab, ...updates } : tab
+      );
       return newTabs;
     });
   };
@@ -646,10 +630,7 @@ const App: React.FC = () => {
   };
 
   const handleLanguageChange = (newLang: string) => {
-    alert(`Changing language to: ${newLang}`);
-    console.log('handleLanguageChange called with:', newLang);
     if (activeTab) {
-      console.log('Updating tab', activeTab.id, 'from', activeTab.language, 'to', newLang);
       updateTab(activeTab.id, { language: newLang });
     }
   };
