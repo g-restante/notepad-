@@ -1,0 +1,240 @@
+/* App Layout Styles */
+.app-layout {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  padding: 0;
+  height: auto;
+  line-height: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-content {
+  flex: 1;
+  padding: 0;
+  overflow: hidden;
+}
+
+.app-footer {
+  padding: 0;
+  height: auto;
+  line-height: 1;
+}
+
+/* Theme Styles */
+.light-theme {
+  background: #ffffff;
+}
+
+.dark-theme {
+  background: #1e1e1e;
+}
+
+.light-theme .app-header {
+  background: #ffffff;
+  border-bottom: 1px solid #d9d9d9;
+}
+
+.dark-theme .app-header {
+  background: #1f1f1f;
+  border-bottom: 1px solid #303030;
+}
+
+.light-theme .app-content {
+  background: #ffffff;
+}
+
+.dark-theme .app-content {
+  background: #1e1e1e;
+}
+
+/* Menu Bar Styles */
+.menu-bar {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.menu-bar .ant-btn {
+  border: none;
+  box-shadow: none;
+}
+
+.menu-bar .ant-btn:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.dark-theme .menu-bar .ant-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Tab Bar Styles */
+.tab-bar .ant-tabs {
+  margin: 0;
+}
+
+.tab-bar .ant-tabs-tab {
+  padding: 8px 12px;
+  margin: 0;
+  border: none;
+  background: transparent;
+}
+
+.tab-bar .ant-tabs-tab-active {
+  background: rgba(0, 120, 204, 0.1);
+}
+
+.dark-theme .tab-bar .ant-tabs-tab-active {
+  background: rgba(0, 120, 204, 0.2);
+}
+
+.tab-bar .ant-tabs-tab:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.dark-theme .tab-bar .ant-tabs-tab:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.tab-bar .ant-tabs-content-holder {
+  display: none;
+}
+
+.tab-bar .ant-tabs-ink-bar {
+  background: #007acc;
+}
+
+/* Custom Scrollbars for Dark Theme */
+.dark-theme ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.dark-theme ::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+.dark-theme ::-webkit-scrollbar-thumb {
+  background: #424242;
+  border-radius: 4px;
+}
+
+.dark-theme ::-webkit-scrollbar-thumb:hover {
+  background: #555555;
+}
+
+/* Light Theme Scrollbars */
+.light-theme ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.light-theme ::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.light-theme ::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.light-theme ::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* Editor Panel Styles */
+.editor-container {
+  position: relative;
+  height: 100%;
+}
+
+/* Find Replace Panel Animation */
+.find-panel-enter {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.find-panel-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 200ms ease-in-out;
+}
+
+.find-panel-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.find-panel-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 200ms ease-in-out;
+}
+
+/* Status Bar Styles */
+.status-bar {
+  background: #007acc;
+  color: white;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+/* Monaco Editor Overrides */
+.monaco-editor {
+  border-radius: 0;
+}
+
+.monaco-editor .margin-view-overlays {
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dark-theme .monaco-editor .margin-view-overlays {
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .menu-bar {
+    padding: 0 8px;
+    gap: 4px;
+  }
+  
+  .tab-bar .ant-tabs-tab {
+    padding: 6px 8px;
+  }
+  
+  .status-bar {
+    padding: 2px 8px;
+    font-size: 11px;
+  }
+  
+  .find-replace-panel {
+    min-width: 300px;
+    margin: 8px;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+/* Loading Spinner Override */
+.ant-spin {
+  color: #007acc;
+}
+
+.dark-theme .ant-spin {
+  color: #007acc;
+}
