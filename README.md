@@ -1,4 +1,6 @@
-# Notepad# 
+# Notepad#
+
+[![Build and Release](https://github.com/g-restante/notepad-/actions/workflows/build.yml/badge.svg)](https://github.com/g-restante/notepad-/actions/workflows/build.yml)
 
 ### *The Modern Text Editor for the 21st Century* 🚀
 
