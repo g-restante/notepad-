@@ -1,0 +1,36 @@
+{
+  "appId": "com.notepadsharp.app",
+  "productName": "notepad#",
+  "copyright": "Copyright © 2024 Giuseppe Restante",
+  "directories": {
+    "output": "release",
+    "buildResources": "build"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "compression": "store",
+  "mac": {
+    "category": "public.app-category.developer-tools",
+    "target": [
+      {
+        "target": "dir"
+      }
+    ],
+    "minimumSystemVersion": "10.15.0"
+  },
+  "win": {
+    "target": [
+      {
+        "target": "dir"
+      }
+    ]
+  },
+  "linux": {
+    "target": [
+      {
+        "target": "dir"
+      }
+    ]
+  }
+}

@@ -11,30 +11,32 @@
     "assets/**/*",
     "!src/**/*",
     "!webpack.config.js",
-    "!tsconfig.json",
-    "!tsconfig.main.json"
+    "!tsconfig*.json",
+    "!*.md",
+    "!*.log",
+    "!node_modules/**/*",
+    "!release/**/*",
+    "!build/**/*",
+    "!.git/**/*",
+    "!.vscode/**/*",
+    "!.github/**/*"
   ],
   "extraMetadata": {
     "main": "dist/main.js"
   },
-  "compression": "maximum",
+  "compression": "normal",
   "mac": {
     "category": "public.app-category.developer-tools",
     "target": [
       {
         "target": "dmg",
         "arch": ["x64", "arm64"]
-      },
-      {
-        "target": "zip",
-        "arch": ["x64", "arm64"]
       }
     ],
     "minimumSystemVersion": "10.15.0",
-    "hardenedRuntime": true,
+    "hardenedRuntime": false,
     "gatekeeperAssess": false,
-    "entitlements": "build/entitlements.mac.plist",
-    "entitlementsInherit": "build/entitlements.mac.plist"
+    "type": "distribution"
   },
   "win": {
     "target": [
