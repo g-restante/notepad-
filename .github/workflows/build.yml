@@ -34,6 +34,12 @@ jobs:
       - name: Build application
         run: npm run build
 
+      - name: Debug build environment
+        run: |
+          echo "OS: ${{ matrix.os }}"
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1
         with:
@@ -50,3 +56,6 @@ jobs:
           
           # Skip code signing for now (can be enabled later with certificates)
           skip_build: false
+        env:
+          # Disable code signing
+          CSC_IDENTITY_AUTO_DISCOVERY: false
