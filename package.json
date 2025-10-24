@@ -11,12 +11,12 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"npm run dev:react\" \"npm run dev:electron\"",
+    "dev": "npm run build:electron && concurrently \"npm run dev:react\" \"npm run watch:electron\" \"npm run dev:electron\"",
     "dev:react": "webpack serve --mode development",
-    "dev:electron": "wait-on http://localhost:3000 && electron .",
+    "dev:electron": "wait-on http://localhost:3000 && wait-on dist/main.js && electron . --disable-dev-shm-usage",
     "dev:watch": "concurrently \"npm run watch:react\" \"npm run watch:electron\"",
     "watch:react": "webpack --mode development --watch",
-    "watch:electron": "npm run build:electron && electron .",
+    "watch:electron": "tsc -p tsconfig.main.json --watch --preserveWatchOutput",
     "build": "npm run build:react && npm run build:electron",
     "build:react": "webpack --mode production",
     "build:electron": "tsc -p tsconfig.main.json",
@@ -61,6 +61,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "html-webpack-plugin": "^5.6.0",
     "jest": "^29.7.0",
+    "nodemon": "^3.1.10",
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",
     "process": "^0.11.10",
@@ -99,11 +100,17 @@
       "target": [
         {
           "target": "dmg",
-          "arch": ["x64", "arm64"]
+          "arch": [
+            "x64",
+            "arm64"
+          ]
         },
         {
           "target": "zip",
-          "arch": ["x64", "arm64"]
+          "arch": [
+            "x64",
+            "arm64"
+          ]
         }
       ],
       "minimumSystemVersion": "10.15.0",
@@ -116,26 +123,37 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64", "ia32"]
+          "arch": [
+            "x64",
+            "ia32"
+          ]
         },
         {
           "target": "portable",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "publisherName": "Giuseppe Restante",
-      "verifyUpdateCodeSignature": false
+      "verifyUpdateCodeSignature": false,
+      "sign": false,
+      "forceCodeSigning": false
     },
     "linux": {
       "category": "Development",
       "target": [
         {
           "target": "AppImage",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "deb",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ]
     },

@@ -67,6 +67,10 @@ module.exports = (env, argv) => {
       },
       webSocketServer: false,
       client: false,
+      // Write files to disk in development mode for Electron
+      devMiddleware: {
+        writeToDisk: true,
+      },
     },
     devtool: isProduction ? 'source-map' : 'eval-source-map',
   };

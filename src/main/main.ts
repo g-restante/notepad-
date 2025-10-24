@@ -1,6 +1,7 @@
 import { app, BrowserWindow, Menu, dialog, ipcMain, shell } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as os from 'node:os';
 
 class NotePadProApp {
   private mainWindow: BrowserWindow | null = null;
@@ -239,6 +240,21 @@ class NotePadProApp {
         ],
       },
       {
+        label: 'Tools',
+        submenu: [
+          {
+            label: 'Compare Files/Text',
+            accelerator: 'CmdOrCtrl+Shift+D',
+            click: () => this.sendToRenderer('menu-compare'),
+          },
+          {
+            label: 'Exit Compare Mode',
+            accelerator: 'Escape',
+            click: () => this.sendToRenderer('menu-exit-compare'),
+          },
+        ],
+      },
+      {
         label: 'Window',
         submenu: [
           { role: 'minimize' },
@@ -274,34 +290,16 @@ class NotePadProApp {
     ipcMain.handle('show-open-dialog', async () => {
       const result = await dialog.showOpenDialog(this.mainWindow!, {
         properties: ['openFile'],
-        filters: [
-          { name: 'All Files', extensions: ['*'] },
-          { name: 'JavaScript', extensions: ['js', 'jsx'] },
-          { name: 'TypeScript', extensions: ['ts', 'tsx'] },
-          { name: 'Web Files', extensions: ['html', 'htm', 'css', 'scss', 'sass'] },
-          { name: 'JSON', extensions: ['json'] },
-          { name: 'Python', extensions: ['py', 'pyw'] },
-          { name: 'Java', extensions: ['java'] },
-          { name: 'C/C++', extensions: ['c', 'cpp', 'h', 'hpp'] },
-          { name: 'Text Files', extensions: ['txt', 'md', 'log'] },
-        ],
+        defaultPath: os.homedir(),
+        // Nessun filtro - mostra tutti i file di default
       });
       return result;
     });
 
     ipcMain.handle('show-save-dialog', async () => {
       const result = await dialog.showSaveDialog(this.mainWindow!, {
-        filters: [
-          { name: 'All Files', extensions: ['*'] },
-          { name: 'JavaScript', extensions: ['js', 'jsx'] },
-          { name: 'TypeScript', extensions: ['ts', 'tsx'] },
-          { name: 'Web Files', extensions: ['html', 'htm', 'css', 'scss', 'sass'] },
-          { name: 'JSON', extensions: ['json'] },
-          { name: 'Python', extensions: ['py', 'pyw'] },
-          { name: 'Java', extensions: ['java'] },
-          { name: 'C/C++', extensions: ['c', 'cpp', 'h', 'hpp'] },
-          { name: 'Text Files', extensions: ['txt', 'md', 'log'] },
-        ],
+        defaultPath: os.homedir(),
+        // Nessun filtro - permette di salvare con qualsiasi estensione
       });
       return result;
     });

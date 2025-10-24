@@ -10,6 +10,8 @@ import {
   SearchOutlined,
   ZoomInOutlined,
   ZoomOutOutlined,
+  ToolOutlined,
+  DiffOutlined,
 } from '@ant-design/icons';
 import { useEditorStore } from '../store/editorStore';
 import type { MenuProps } from 'antd';
@@ -30,6 +32,7 @@ export const MenuBar: React.FC = () => {
     toggleLineNumbers,
     toggleMinimap,
     toggleWordWrap,
+    openCompareDialog,
   } = useEditorStore();
 
   const handleNewFile = () => {
@@ -83,6 +86,15 @@ export const MenuBar: React.FC = () => {
     },
   ];
 
+  const toolsMenuItems: MenuProps['items'] = [
+    {
+      key: 'compare',
+      label: 'Compare Files/Text',
+      onClick: openCompareDialog,
+      icon: <DiffOutlined />,
+    },
+  ];
+
   return (
     <div className="menu-bar" style={{ 
       display: 'flex', 
@@ -129,8 +141,16 @@ export const MenuBar: React.FC = () => {
           />
         </Tooltip>
 
+        <Dropdown menu={{ items: toolsMenuItems }} placement="bottomLeft">
+          <Tooltip title="Tools">
+            <Button type="text" icon={<ToolOutlined />} />
+          </Tooltip>
+        </Dropdown>
+
         <Dropdown menu={{ items: viewMenuItems }} placement="bottomLeft">
-          <Button type="text" icon={<SettingOutlined />} />
+          <Tooltip title="View Settings">
+            <Button type="text" icon={<SettingOutlined />} />
+          </Tooltip>
         </Dropdown>
 
         <Tooltip title={isDarkMode ? 'Switch to Light Theme' : 'Switch to Dark Theme'}>

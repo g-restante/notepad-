@@ -32,6 +32,9 @@ interface EditorState {
   showFindPanel: boolean;
   showReplacePanel: boolean;
   
+  // Compare
+  showComparePanel: boolean;
+  
   // Actions
   addTab: (tab: Omit<EditorTab, 'id'>) => void;
   closeTab: (tabId: string) => void;
@@ -58,6 +61,10 @@ interface EditorState {
   toggleFindPanel: () => void;
   toggleReplacePanel: () => void;
   
+  // Compare Actions
+  toggleComparePanel: () => void;
+  openCompareDialog: () => void;
+  
   // File operations
   newFile: () => void;
   openFile: () => Promise<void>;
@@ -81,6 +88,7 @@ export const useEditorStore = create<EditorState>()(
     replaceTerm: '',
     showFindPanel: false,
     showReplacePanel: false,
+    showComparePanel: false,
 
     // Tab management
     addTab: (tabData) => {
@@ -199,6 +207,15 @@ export const useEditorStore = create<EditorState>()(
 
     toggleReplacePanel: () => {
       set((state) => ({ showReplacePanel: !state.showReplacePanel }));
+    },
+
+    // Compare operations
+    toggleComparePanel: () => {
+      set((state) => ({ showComparePanel: !state.showComparePanel }));
+    },
+
+    openCompareDialog: () => {
+      set({ showComparePanel: true });
     },
 
     // File operations
