@@ -20,11 +20,11 @@
     "build": "npm run build:react && npm run build:electron",
     "build:react": "webpack --mode production",
     "build:electron": "tsc -p tsconfig.main.json",
-    "package": "npm run build && electron-builder",
-    "package:all": "npm run build && electron-builder --mac --win --linux",
-    "package:mac": "npm run build && electron-builder --mac",
-    "package:win": "npm run build && electron-builder --win",
-    "package:linux": "npm run build && electron-builder --linux",
+    "package": "npm run build && electron-builder --config electron-builder.json",
+    "package:all": "npm run build && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --config electron-builder.json --mac --win --linux",
+    "package:mac": "npm run build && electron-builder --config electron-builder.json --mac",
+    "package:win": "npm run build && electron-builder --config electron-builder.json --win",
+    "package:linux": "npm run build && electron-builder --config electron-builder.json --linux",
     "release": "npm run build && electron-builder --publish=never",
     "release:all": "npm run build && electron-builder --mac --win --linux --publish=never",
     "dist": "npm run package:all",
@@ -138,7 +138,10 @@
       "publisherName": "Giuseppe Restante",
       "verifyUpdateCodeSignature": false,
       "sign": false,
-      "forceCodeSigning": false
+      "forceCodeSigning": false,
+      "signtool": false,
+      "certificateFile": null,
+      "certificatePassword": null
     },
     "linux": {
       "category": "Development",
