@@ -138,12 +138,7 @@
         }
       ],
       "publisherName": "Giuseppe Restante",
-      "verifyUpdateCodeSignature": false,
-      "sign": false,
-      "forceCodeSigning": false,
-      "signtool": false,
-      "certificateFile": null,
-      "certificatePassword": null
+      "verifyUpdateCodeSignature": false
     },
     "linux": {
       "category": "Development",
