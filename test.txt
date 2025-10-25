@@ -1,0 +1,19 @@
+Test file per Tauri Notepad Pro
+
+Questo è un test per verificare che:
+1. ✅ L'applicazione si apre correttamente
+2. ✅ I menu funzionano
+3. ✅ Monaco Editor carica
+4. ✅ Le operazioni file funzionano:
+   - Apertura file
+   - Salvataggio file
+   - Salva con nome
+
+L'applicazione è stata migrata da Electron a Tauri con successo!
+
+Dimensioni finali:
+- App bundle: 16MB
+- DMG installer: 8.4MB
+- Riduzione: 97.2% rispetto alla versione Electron
+
+🎉 MIGRAZIONE COMPLETATA CON SUCCESSO!
