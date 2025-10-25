@@ -11,179 +11,43 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "npm run build:electron && concurrently \"npm run dev:react\" \"npm run watch:electron\" \"npm run dev:electron\"",
-    "dev:react": "webpack serve --mode development",
-    "dev:electron": "wait-on http://localhost:3000 && wait-on dist/main.js && electron . --disable-dev-shm-usage",
-    "dev:watch": "concurrently \"npm run watch:react\" \"npm run watch:electron\"",
-    "watch:react": "webpack --mode development --watch",
-    "watch:electron": "tsc -p tsconfig.main.json --watch --preserveWatchOutput",
-    "build": "npm run build:react && npm run build:electron",
-    "build:react": "webpack --mode production",
-    "build:electron": "tsc -p tsconfig.main.json",
-    "package": "npm run build && electron-builder --config electron-builder.json",
-    "package:all": "npm run build && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --config electron-builder.json --mac --win --linux",
-    "package:mac": "npm run build && electron-builder --config electron-builder.json --mac",
-    "package:mac:fast": "npm run build && electron-builder --config electron-builder-fast.json --mac",
-    "package:win": "npm run build && electron-builder --config electron-builder.json --win",
-    "package:win:fast": "npm run build && electron-builder --config electron-builder-fast.json --win",
-    "package:linux": "npm run build && electron-builder --config electron-builder.json --linux",
-    "release": "npm run build && electron-builder --publish=never",
-    "release:all": "npm run build && electron-builder --mac --win --linux --publish=never",
-    "dist": "npm run package:all",
+    "dev": "npm run build && npx tauri dev",
+    "build": "webpack --mode production",
+    "tauri": "npx tauri",
     "test": "jest",
     "lint": "eslint src/**/*.{ts,tsx}",
     "lint:fix": "eslint src/**/*.{ts,tsx} --fix",
-    "clean": "rm -rf dist release node_modules/.cache",
-    "postinstall": "electron-builder install-app-deps"
+    "clean": "rm -rf dist release node_modules/.cache"
   },
   "dependencies": {
     "@ant-design/icons": "^5.2.6",
     "@monaco-editor/react": "^4.6.0",
     "antd": "^5.12.8",
-    "electron-store": "^8.1.0",
     "monaco-editor": "^0.45.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "zustand": "^4.4.7"
   },
   "devDependencies": {
+    "@tauri-apps/api": "^2.9.0",
+    "@tauri-apps/cli": "^2.9.1",
     "@types/node": "^20.10.6",
     "@types/react": "^18.2.46",
     "@types/react-dom": "^18.2.18",
     "@typescript-eslint/eslint-plugin": "^6.16.0",
     "@typescript-eslint/parser": "^6.16.0",
-    "buffer": "^6.0.3",
-    "concurrently": "^8.2.2",
-    "crypto-browserify": "^3.12.1",
     "css-loader": "^6.8.1",
-    "electron": "^28.1.4",
-    "electron-builder": "^24.9.1",
     "eslint": "^8.56.0",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "html-webpack-plugin": "^5.6.0",
     "jest": "^29.7.0",
     "nodemon": "^3.1.10",
-    "os-browserify": "^0.3.0",
-    "path-browserify": "^1.0.1",
-    "process": "^0.11.10",
-    "stream-browserify": "^3.0.0",
     "style-loader": "^3.3.4",
     "ts-loader": "^9.5.1",
     "typescript": "^5.3.3",
-    "util": "^0.12.5",
-    "wait-on": "^7.2.0",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1"
-  },
-  "build": {
-    "appId": "com.notepadsharp.app",
-    "productName": "notepad#",
-    "copyright": "Copyright © 2024 Giuseppe Restante",
-    "directories": {
-      "output": "release",
-      "buildResources": "build"
-    },
-    "files": [
-      "dist/**/*",
-      "assets/**/*",
-      "!src/**/*",
-      "!webpack.config.js",
-      "!tsconfig.json",
-      "!tsconfig.main.json"
-    ],
-    "extraMetadata": {
-      "main": "dist/main.js"
-    },
-    "compression": "maximum",
-    "mac": {
-      "category": "public.app-category.developer-tools",
-      "target": [
-        {
-          "target": "dmg",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
-        },
-        {
-          "target": "zip",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
-        }
-      ],
-      "minimumSystemVersion": "10.15.0",
-      "hardenedRuntime": true,
-      "gatekeeperAssess": false,
-      "entitlements": "build/entitlements.mac.plist",
-      "entitlementsInherit": "build/entitlements.mac.plist"
-    },
-    "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64",
-            "ia32"
-          ]
-        },
-        {
-          "target": "portable",
-          "arch": [
-            "x64"
-          ]
-        }
-      ],
-      "publisherName": "Giuseppe Restante",
-      "verifyUpdateCodeSignature": false
-    },
-    "linux": {
-      "category": "Development",
-      "target": [
-        {
-          "target": "AppImage",
-          "arch": [
-            "x64"
-          ]
-        },
-        {
-          "target": "deb",
-          "arch": [
-            "x64"
-          ]
-        }
-      ]
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "shortcutName": "notepad#"
-    },
-    "dmg": {
-      "title": "notepad# Installer",
-      "backgroundColor": "#1e1e1e",
-      "window": {
-        "width": 540,
-        "height": 380
-      },
-      "contents": [
-        {
-          "x": 410,
-          "y": 190,
-          "type": "link",
-          "path": "/Applications"
-        },
-        {
-          "x": 130,
-          "y": 190,
-          "type": "file"
-        }
-      ]
-    }
   }
 }

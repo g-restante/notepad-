@@ -7,7 +7,7 @@ module.exports = (env, argv) => {
 
   return {
     entry: './src/renderer/index.tsx',
-    target: 'electron-renderer', // Always use electron-renderer target
+    target: 'web', // Changed from electron-renderer to web for Tauri
     context: path.resolve(__dirname),
     module: {
       rules: [
@@ -57,17 +57,14 @@ module.exports = (env, argv) => {
         directory: path.resolve(__dirname, 'dist'),
       },
       port: 3000,
-      hot: false,
-      liveReload: false,
+      hot: true, // Enable hot reload for Tauri development
       historyApiFallback: true,
       host: 'localhost',
       allowedHosts: 'all',
       headers: {
         'Access-Control-Allow-Origin': '*',
       },
-      webSocketServer: false,
-      client: false,
-      // Write files to disk in development mode for Electron
+      // Write files to disk for Tauri to serve
       devMiddleware: {
         writeToDisk: true,
       },

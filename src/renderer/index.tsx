@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { notification } from 'antd';
+import { tauriAPI } from './api/tauriAPI';
 
 // Monaco Editor configuration for Electron
 if (typeof global === 'undefined') {
@@ -1254,55 +1255,37 @@ const App: React.FC = () => {
   };
 
   const handleOpen = async () => {
-    if (!window.electronAPI) {
-      notification.warning({
-        message: 'File Operations Unavailable',
-        description: 'File operations are not available in this environment.',
-        placement: 'topRight',
-      });
-      return;
-    }
-
     try {
-      const result = await window.electronAPI.showOpenDialog();
-      if (result.canceled || !result.filePaths?.length) return;
+      const filePath = await tauriAPI.openFile();
+      if (!filePath) return;
 
-      const filePath = result.filePaths[0];
-      const fileResult = await window.electronAPI.readFile(filePath);
+      const content = await tauriAPI.readFileContent(filePath);
       
-      if (fileResult.success && fileResult.content !== undefined) {
-        const fileName = extractFileName(filePath);
-        const language = detectLanguageFromFileName(fileName);
-        
-        const newTab: FileTab = {
-          id: Date.now().toString(),
-          title: fileName,
-          content: fileResult.content,
-          filePath: filePath,
-          isDirty: false,
-          language: language
-        };
-        
-        // Add to global cache
-        setTabs([...tabs, newTab]);
-        setActiveTabId(newTab.id);
-        
-        // Add to left panel
-        setSplitLayout(prev => ({
-          ...prev,
-          leftPanel: {
-            ...prev.leftPanel,
-            tabs: [...prev.leftPanel.tabs, newTab],
-            activeTabId: newTab.id
-          }
-        }));
-      } else {
-        notification.error({
-          message: 'File Read Error',
-          description: `Error reading file: ${fileResult.error}`,
-          placement: 'topRight',
-        });
-      }
+      const fileName = extractFileName(filePath);
+      const language = detectLanguageFromFileName(fileName);
+      
+      const newTab: FileTab = {
+        id: Date.now().toString(),
+        title: fileName,
+        content: content,
+        filePath: filePath,
+        isDirty: false,
+        language: language
+      };
+      
+      // Add to global cache
+      setTabs([...tabs, newTab]);
+      setActiveTabId(newTab.id);
+      
+      // Add to left panel
+      setSplitLayout(prev => ({
+        ...prev,
+        leftPanel: {
+          ...prev.leftPanel,
+          tabs: [...prev.leftPanel.tabs, newTab],
+          activeTabId: newTab.id
+        }
+      }));
     } catch (error) {
       notification.error({
         message: 'File Open Error',
@@ -1313,21 +1296,13 @@ const App: React.FC = () => {
   };
 
   const handleSave = async () => {
-    if (!activeTab || !window.electronAPI) return;
+    if (!activeTab) return;
 
     try {
       if (activeTab.filePath) {
         // Save existing file
-        const result = await window.electronAPI.writeFile(activeTab.filePath, activeTab.content);
-        if (result.success) {
-          updateTab(activeTab.id, { isDirty: false });
-        } else {
-          notification.error({
-            message: 'File Save Error',
-            description: `Error saving file: ${result.error}`,
-            placement: 'topRight',
-          });
-        }
+        await tauriAPI.writeFileContent(activeTab.filePath, activeTab.content);
+        updateTab(activeTab.id, { isDirty: false });
       } else {
         // Save as new file
         handleSaveAs();
@@ -1342,30 +1317,23 @@ const App: React.FC = () => {
   };
 
   const handleSaveAs = async () => {
-    if (!activeTab || !window.electronAPI) return;
+    if (!activeTab) return;
 
     try {
-      const result = await window.electronAPI.showSaveDialog();
-      if (result.canceled || !result.filePath) return;
+      const filePath = await tauriAPI.saveFile();
+      if (!filePath) return;
 
-      const saveResult = await window.electronAPI.writeFile(result.filePath, activeTab.content);
-      if (saveResult.success) {
-        const fileName = extractFileName(result.filePath);
-        const detectedLanguage = detectLanguageFromFileName(fileName);
-        
-        updateTab(activeTab.id, { 
-          title: fileName,
-          filePath: result.filePath,
-          isDirty: false,
-          language: detectedLanguage
-        });
-      } else {
-        notification.error({
-          message: 'File Save Error',
-          description: `Error saving file: ${saveResult.error}`,
-          placement: 'topRight',
-        });
-      }
+      await tauriAPI.writeFileContent(filePath, activeTab.content);
+      
+      const fileName = extractFileName(filePath);
+      const detectedLanguage = detectLanguageFromFileName(fileName);
+      
+      updateTab(activeTab.id, { 
+        title: fileName,
+        filePath: filePath,
+        isDirty: false,
+        language: detectedLanguage
+      });
     } catch (error) {
       notification.error({
         message: 'File Save Error',
